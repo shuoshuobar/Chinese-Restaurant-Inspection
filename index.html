@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Chinese Restaurant Closures Timeline</title>
+    <style>
+        :root {
+            --primary: #8b0000; /* dark red */
+            --secondary: #f1faee;
+            --dark: #1d3557;
+            --medium: #457b9d;
+            --light: #f8f9fa;
+            --timeline-bg: #f8f8f8;
+            --timeline-border: #e0e0e0;
+            --text-dark: #333;
+            --text-light: #666;
+            --link-color: #0056b3;
+            --border-light: #ddd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+        
+        body {
+            background-color: #fff;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        header {
+            background-color: #fff;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .navigation a {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .main-container {
+            display: flex;
+            max-width: 100%;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        /* Left Timeline */
+        .timeline-left {
+            width: 230px;
+            background-color: var(--timeline-bg);
+            border-right: 1px solid var(--timeline-border);
+            padding: 0;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        
+        /* Right Timeline */
+        .timeline-right {
+            width: 230px;
+            background-color: var(--timeline-bg);
+            border-left: 1px solid var(--timeline-border);
+            padding: 0;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 460px);
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        .article-header {
+            margin-bottom: 2rem;
+        }
+        
+        .article-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            color: var(--primary)
+        }
+        
+        .article-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .byline {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+        
+        .article-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .article-content h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary);
+        }
+        
+        .article-content blockquote {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+            border-left: 4px solid var(--primary);
+            font-style: italic;
+            color: var(--text-light);
+        }
+        
+        /* Timeline Event Styling */
+        .timeline-event {
+            padding: 1rem;
+            border-bottom: 1px solid var(--timeline-border);
+            position: relative;
+            background-color: #fff;
+        }
+        
+        .timeline-event:last-child {
+            border-bottom: none;
+        }
+        
+        .timeline-date {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .timeline-description, .timeline-details {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        /* Left timeline specific */
+        .timeline-left .timeline-event {
+            text-align: right;
+            padding-left: 20px;
+        }
+        
+        .timeline-left .timeline-event::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 1.5rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary);
+        }
+        
+        /* Right timeline specific */
+        .timeline-right .timeline-event {
+            text-align: left;
+            padding-right: 20px;
+        }
+        
+        .timeline-right .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 1.5rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary);
+        }
+        
+        /* Victim card styling */
+        .victim-card {
+            background-color: transparent;
+            color: var(--text-dark);
+            padding: 0;
+        }
+        
+        .victim-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .victim-details {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Bill card styling */
+        .bill-card {
+            background-color: transparent;
+            color: var(--text-dark);
+            padding: 0;
+        }
+        
+        .bill-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--dark);
+        }
+        
+        .bill-details {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Images */
+        .article-image {
+            width: 100%;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+        
+        .image-caption {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .timeline-left, .timeline-right {
+                width: 100%;
+                height: auto;
+                position: static;
+                border: none;
+            }
+            
+            .timeline-left {
+                border-bottom: 1px solid var(--timeline-border);
+            }
+            
+            .timeline-right {
+                border-top: 1px solid var(--timeline-border);
+            }
+            
+            .content {
+                max-width: 100%;
+                order: -1;
+            }
+            
+            .timeline-left .timeline-event,
+            .timeline-right .timeline-event {
+                text-align: left;
+                padding-left: 2rem;
+            }
+            
+            .timeline-left .timeline-event::after {
+                left: 10px;
+                right: auto;
+            }
+        }
+        
+        /* Icons for specific events */
+        .icon-bill::before, .icon-hearing::before, .icon-vote::before, .icon-law::before, .icon-victim::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            vertical-align: middle;
+        }
+        
+        .timeline-icon {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+        
+        .timeline-left .timeline-icon {
+            right: -10px;
+            top: 1.5rem;
+        }
+        
+        .timeline-right .timeline-icon {
+            left: -10px;
+            top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Timeline - Same as Right Timeline -->
+        <div class="timeline-left">
+            <div class="timeline-event">
+                <div class="timeline-date">Jul. 6, 2022</div>
+                <div class="timeline-title">Closed Establishment</div>
+                <div class="timeline-details">Rodents/Insects/Pests Harborage/Conditions; Not Protected from Contamination Source; Adulterated/Contaminated Food; Foods Temperature Control; Mice/Rats.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Jul. 8, 2022</div>
+                <div class="timeline-title">Re-opened Establishment</div>
+                <div class="timeline-details">Not Protected from Contamination Source.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Dec. 13, 2023</div>
+                <div class="timeline-title">Alleged Violations</div>
+                <div class="timeline-details">Mice/Rats; Cleaning Accessibility; Rodents/Insects/Pests Harborage/Conditions; Adulterated/Contaminated Food; Toilet Facility Not Well-maintained.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Jan. 18, 2024</div>
+                <div class="timeline-title">Alleged Violations</div>
+                <div class="timeline-details">Rodents/Insects/Pests Harborage/Conditions; Foods Temperature Control; Cleaning Accessibility; Mice/Rats; Improper/Contaminated Food Contact Surface; Improper Draining/Sewage Disposal.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Jan. 10, 2025</div>
+                <div class="timeline-title">Closed Establishment</div>
+                <div class="timeline-details">Mice/Rats; Cleaning Accessibility; Foods Temperature Control; Rodents/Insects/Pests Harborage/Conditions; Adulterated/Contaminated Food.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Jan. 14, 2025</div>
+                <div class="timeline-title">Re-opened Establishment</div>
+                <div class="timeline-details">Cleaning Accessibility.</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <div class="article-header">
+                <h1 class="article-title">Health Code Violations Spark Chinese Restaurant Closures</h1>
+                <h2 class="article-subtitle">NYC's Chinese Restaurants Under Scrutiny</h2>
+                <p class="byline"><a href="https://shuoshuobar.github.io/Portfolio/">Yushuo Wang</a> | April 13, 2025</p>
+            </div>
+            
+            <div class="article-content">
+                <p>After three consecutive closure orders following inspections in late March, <em>We Noodle</em>, a Chinese restaurant in Manhattan, reopened on Mar. 28. The restaurant was originally called to cease operations by the New York City Department of Health & Mental Hygiene (DOHMH) due to serious health code violations.</p>
+                
+                <blockquote>
+                    "Today I ordered a takeaway from their home, and when I opened it, I saw a cockroach. I think their hygienic condition must be worrying," a customer named 'Dawson' left a one-star review on Google about a month ago.
+                </blockquote>
+                
+                <p>Evidence of mice and conditions favorable for rodents, insects or other pests appeared on both Mar. 20 and during a follow-up inspection five days later.</p>
+                
+                <p>Although the reopening inspection did not identify foodborne disease risks, the restaurant was still considered for having food contact surfaces that were "not easily cleanable, sanitized, and maintained," according to the DOHMH. The restaurant now carries a "Z" pending grade because of the closure on initial inspection.</p>
+                
+                <h2>NYC Restaurant Grading System</h2>
+                
+                <p>The restaurant grading system in NYC began in Jul. 2010 as a measure of restaurant hygiene standards. Every restaurant is subject to at least one unannounced inspection each year.</p>
+                
+                <p>If a closure occurs at an initial inspection like <em>We Noodle</em>, the restaurant is given a "Grade Pending" card until the next re-inspection determines its grade. For closures during a re-inspection, the restaurant's current grade is based on the score received before the closure.</p>
+                
+                <p>As the new year kicks off, 16 more Chinese restaurants stumbled in the same boat with <em>We Noodle</em>, opening and closing repeatedly under DOHMH inspections.</p>
+                
+                <h2>Pattern of Closures</h2>
+                
+                <p>The earliest closure of <em>Dynasty Taste Lam</em> dates to three years ago on Jul. 6. The restaurant experienced another closure early this year and reopened in mid-January.</p>
+                
+                <p><em>Chairman Sun</em>, holding the most violation remarks from DOHMH, closed in late 2024, reopened in less than a week and was hit with closure and reclosure in March.</p>
+                
+                <p>Over the past five years, Queens borough with the most Chinese population, followed by Brooklyn, has sees the most Chinese restaurant closures.</p>
+                
+                <p>It was a week ago when <em>We Noodle</em> reopened and responded to 'Dawson's' review.</p>
+                
+                <blockquote>
+                    "Thank you for your feedback. We take hygiene very seriously in our restaurant, and it is highly unusual for any contamination to occur. We ensure that all meals are clean and safe before leaving our kitchen. We apologize for your experience and appreciate your understanding."
+                </blockquote>
+            </div>
+        </div>
+        
+        <!-- Right Timeline - Same as Left Timeline -->
+        <div class="timeline-right">
+            <div class="timeline-event">
+                <div class="timeline-date">Oct. 26, 2022</div>
+                <div class="timeline-title">Alleged Violations</div>
+                <div class="timeline-details">Foods Temperature Control; Improper Thawing Procedure; Improper Food Sourcing/Processing; Mice/Rats; Rodents/Insects/Pests Harborage/Conditions; Improper Draining/Sewage Disposal; Improper/Contaminated Food Contact Surface; Cleaning Accessibility; Missing Thermometer for Food Temperature; Missing Food Protection Certificate.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Jan. 23, 2023</div>
+                <div class="timeline-title">Alleged Violations</div>
+                <div class="timeline-details">Missing Thermometer for Food Temperature; Improper Food Sourcing/Processing; Deficient Hand Washing Facility; Missing Food Protection Certificate; Improper Draining/Sewage Disposal; Cleaning Accessibility; Improper/Contaminated Food Contact Surface; Foods Temperature Control; Inadequate Personal Cleanliness.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">May. 23, 2024</div>
+                <div class="timeline-title">Closed Establishment</div>
+                <div class="timeline-details">No Pest Management Professional Contract; Deficient Hand Washing Facility; Rodents/Insects/Pests Harborage/Conditions; Improper Food Sourcing/Processing; Mice/Rats; Improper/Contaminated Food Contact Surface; Cleaning Accessibility; Missing Letter Grade Card; Toilet Facility Not Well-maintained; Roaches; Foods Temperature Control.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">May. 29, 2024</div>
+                <div class="timeline-title">Re-opened Establishment</div>
+                <div class="timeline-details">Roaches; Rodents/Insects/Pests Harborage/Conditions.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Dec. 16, 2024</div>
+                <div class="timeline-title">Alleged Violations</div>
+                <div class="timeline-details">Missing Food Protection Certificate; Missing Thermometer for Food Temperature; Rodents/Insects/Pests Harborage/Conditions; Mice/Rats; Foods Temperature Control.</div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-date">Mar. 18, 2025</div>
+                <div class="timeline-title">Closed Establishment</div>
+                <div class="timeline-details">Improper Draining/Sewage Disposal; Foods Temperature Control; Deficient Dish/Ware Washing; Missing Protection to Contamination Source; Mice/Rats; Pesticide Misuse/Improper Storage; Foods Temperature Control; Deficient Hand Washing Facility; Adulterated/Contaminated Food; Rodents/Insects/Pests Harborage/Conditions; Improper Food Sourcing/Processing;</div>
+            </div>
+
+            <div class="timeline-event">
+                <div class="timeline-date">Mar. 27, 2025</div>
+                <div class="timeline-title">Re-closed Establishment</div>
+                <div class="timeline-details">Missing Protection to Contamination Source; Improper Draining/Sewage Disposal; Adulterated/Contaminated Food; Rodents/Insects/Pests Harborage/Conditions; Deficient Dish/Ware Washing; Foods Temperature Control; Mice/Rats; Pesticide Misuse/Improper Storage; Cleaning Accessibility.</div>
+            </div>
+        </div>
