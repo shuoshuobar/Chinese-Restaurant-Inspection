@@ -23,4 +23,4 @@ Collected Chinese restaurant inspections and violations data from NYC Open Data:
 5. HTML: Webpage design - side by side timeline design
 
 ## Limitation/Looking Ahead:
-1. The treemap is responsive, but there are currently too much text information on it, making it hard to read and need to change the font aesthetically。
+1. The treemap is responsive, but there are currently too much text information on it, making it hard to read and need to change the font aesthetically.
